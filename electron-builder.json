@@ -1,10 +1,24 @@
+
 {
   "appId": "com.keepscribe.desktop",
   "productName": "KeepScribe",
   "electronVersion": "33.2.1",
-  "asar": false,
+  "asar": true,
   "directories": {
     "output": "release-builds"
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb",
+      "tar.gz"
+    ],
+    "category": "Office",
+    "maintainer": "Akash <akash.self.code@gmail.com>",
+    "synopsis": "Creative Writer's Studio",
+    "description": "An extended Google Keep for creative writers with multi-page story notes, sketch and media elements, and an interactive key-value vocabulary map.",
+    "icon": "public/pwa-512x512.png",
+    "syncDesktopName": true
   },
   "files": [
     "dist/**/*",
@@ -15,16 +29,6 @@
   "extraMetadata": {
     "main": "electron/main.cjs",
     "author": "Akash"
-  },
-  "linux": {
-    "target": [
-      "AppImage",
-      "deb",
-      "tar.gz"
-    ],
-    "category": "Office",
-    "icon": "public/pwa-512x512.png",
-    "synopsis": "Creative Writer's Studio for multi-page notes, sketches, media & vocabulary",
-    "description": "An extended Google Keep for creative writers with multi-page story notes, sketch & media elements, and an interactive key-value vocabulary map."
   }
 }
+
