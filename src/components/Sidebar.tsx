@@ -11,6 +11,7 @@ import {
   Plus,
   BookOpen,
   Cloud,
+  FolderArchive,
 } from 'lucide-react';
 import { NavSection } from '../types';
 
@@ -27,6 +28,7 @@ interface SidebarProps {
   isCollapsed: boolean;
   onOpenShortcuts: () => void;
   onOpenEditLabels: () => void;
+  onOpenExport?: () => void;
   isDark: boolean;
 }
 
@@ -43,6 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onOpenShortcuts,
   onOpenEditLabels,
+  onOpenExport,
   isDark,
 }) => {
   const navItems = [
@@ -182,6 +185,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Bottom Area: Arch Linux / Android Shortcuts Button */}
       <div className="p-3 border-t border-gray-800 space-y-1">
+        {onOpenExport && (
+          <button
+            onClick={onOpenExport}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+              isDark
+                ? 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/10'
+                : 'text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+            }`}
+            title="Export Notes as Independent Folders (.md + assets)"
+          >
+            <FolderArchive size={17} className="text-amber-400 shrink-0" />
+            {!isCollapsed && <span>Export Notes Folder</span>}
+          </button>
+        )}
+
         <button
           onClick={onOpenShortcuts}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition cursor-pointer ${

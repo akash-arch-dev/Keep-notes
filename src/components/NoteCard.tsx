@@ -14,10 +14,19 @@ import {
   Edit3,
   FileText,
   RotateCcw,
+  FolderArchive,
+  FolderDown,
+  FileCode,
 } from 'lucide-react';
 import { Note, KeepColorId } from '../types';
 import { KEEP_COLORS, getCardColorStyle } from '../utils/colors';
 import { ConfirmModal } from './ConfirmModal';
+import {
+  exportNoteAsMarkdownProject,
+  exportNoteToLocalDirectory,
+  exportNoteAsStandaloneMarkdown,
+  isDirectoryPickerSupported,
+} from '../services/markdownExport';
 
 interface NoteCardProps {
   note: Note;
@@ -334,6 +343,61 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                       <Copy size={13} />
                       Duplicate Note
                     </button>
+                    <div className="my-1 border-t border-gray-700/60" />
+                    {isDirectoryPickerSupported() && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setShowMoreMenu(false);
+                          try {
+                            const folder = await exportNoteToLocalDirectory(note);
+                            alert(`Saved note folder to: ${folder}`);
+                          } catch (err: any) {
+                            if (err.name !== 'AbortError') {
+                              alert(`Folder export error: ${err?.message || 'Error'}`);
+                            }
+                          }
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-amber-500/20 text-amber-300 flex items-center gap-2"
+                        title="Directly write note folder to your computer disk"
+                      >
+                        <FolderDown size={13} />
+                        Export to Local Folder
+                      </button>
+                    )}
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        setShowMoreMenu(false);
+                        try {
+                          await exportNoteAsMarkdownProject(note);
+                        } catch (err: any) {
+                          alert(`Export failed: ${err?.message || 'Error'}`);
+                        }
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-amber-500/20 text-amber-300 flex items-center gap-2"
+                      title="Download note folder with index.md and assets/ as .zip"
+                    >
+                      <FolderArchive size={13} />
+                      Export Folder (.zip)
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMoreMenu(false);
+                        try {
+                          exportNoteAsStandaloneMarkdown(note);
+                        } catch (err: any) {
+                          alert(`Export failed: ${err?.message || 'Error'}`);
+                        }
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-gray-800 text-gray-300 flex items-center gap-2"
+                      title="Download index.md file"
+                    >
+                      <FileCode size={13} />
+                      Export index.md
+                    </button>
+                    <div className="my-1 border-t border-gray-700/60" />
                     <button
                       onClick={() => {
                         onTrash(note.id);

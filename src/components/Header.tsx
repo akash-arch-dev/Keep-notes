@@ -131,13 +131,13 @@ export const Header: React.FC<HeaderProps> = ({
           {viewMode === 'grid' ? <List size={19} /> : <LayoutGrid size={19} />}
         </button>
 
-        {/* Backup Export */}
+        {/* Backup & Markdown Projects Export */}
         <button
           onClick={onExport}
           className={`p-2 rounded-full transition cursor-pointer ${
             isDark ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
           }`}
-          title="Export JSON Backup (Sync between Linux & Android)"
+          title="Export Notes (.md project workspace, JSON backup, Codex)"
         >
           <Download size={19} />
         </button>

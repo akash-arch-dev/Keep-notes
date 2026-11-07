@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "keepscribe",
+  "version": "1.0.0",
+  "description": "Extended Google Keep for creative writers with multi-page notes, sketches, audio, video, and vocabulary codex",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
@@ -14,9 +15,11 @@
     "@google/genai": "^2.4.0",
     "@supabase/supabase-js": "^2.119.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/jszip": "^3.4.0",
     "@vitejs/plugin-react": "^6.1.1",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
+    "jszip": "^3.10.2",
     "lucide-react": "^0.546.0",
     "mongodb": "^7.8.0",
     "motion": "^12.23.24",

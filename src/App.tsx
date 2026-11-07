@@ -24,6 +24,7 @@ import { ConfirmModal } from './components/ConfirmModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
 import { EditLabelsModal } from './components/EditLabelsModal';
 import { ImportModal } from './components/ImportModal';
+import { ExportModal } from './components/ExportModal';
 import {
   Pin,
   Trash2,
@@ -59,6 +60,7 @@ export default function App() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isEditLabelsOpen, setIsEditLabelsOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isConfirmEmptyTrashOpen, setIsConfirmEmptyTrashOpen] = useState(false);
 
   // MongoDB Cloud Sync State
@@ -187,6 +189,7 @@ export default function App() {
         if (isShortcutsOpen) setIsShortcutsOpen(false);
         if (isEditLabelsOpen) setIsEditLabelsOpen(false);
         if (isImportOpen) setIsImportOpen(false);
+        if (isExportModalOpen) setIsExportModalOpen(false);
         return;
       }
 
@@ -208,7 +211,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeEditingNote, isShortcutsOpen, isEditLabelsOpen, isImportOpen]);
+  }, [activeEditingNote, isShortcutsOpen, isEditLabelsOpen, isImportOpen, isExportModalOpen]);
 
   // Save Notes helper
   const updateNotesState = (newNotes: Note[]) => {
@@ -442,7 +445,7 @@ export default function App() {
         onToggleViewMode={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
         isDark={isDark}
         onToggleDark={() => setIsDark(!isDark)}
-        onExport={exportAllData}
+        onExport={() => setIsExportModalOpen(true)}
         onOpenImport={() => setIsImportOpen(true)}
       />
 
@@ -465,6 +468,7 @@ export default function App() {
           isCollapsed={isSidebarCollapsed}
           onOpenShortcuts={() => setIsShortcutsOpen(true)}
           onOpenEditLabels={() => setIsEditLabelsOpen(true)}
+          onOpenExport={() => setIsExportModalOpen(true)}
           isDark={isDark}
         />
 
@@ -689,6 +693,15 @@ export default function App() {
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         onImportSuccess={refreshAfterImport}
+      />
+
+      {/* Export Studio Projects & Markdown Workspace Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        notes={notes}
+        vocabulary={vocabulary}
+        isDark={isDark}
       />
 
       {/* Confirmation Dialog before Emptying Trash */}

@@ -1,0 +1,6 @@
+{
+  "appId": "com.keepscribe.writer",
+  "appName": "KeepScribe",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

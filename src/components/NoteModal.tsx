@@ -23,6 +23,10 @@ import {
   Play,
   Pause,
   ZoomIn,
+  FolderArchive,
+  FolderDown,
+  FileCode,
+  Loader2,
 } from 'lucide-react';
 import { Note, NotePage, MediaItem, KeepColorId, VocabularyItem } from '../types';
 import { KEEP_COLORS, getCardColorStyle } from '../utils/colors';
@@ -32,6 +36,12 @@ import { VideoModal } from './VideoModal';
 import { VocabularyDrawer } from './VocabularyDrawer';
 import { ConfirmModal } from './ConfirmModal';
 import { uploadMediaToSupabase } from '../services/supabase';
+import {
+  exportNoteAsMarkdownProject,
+  exportNoteToLocalDirectory,
+  exportNoteAsStandaloneMarkdown,
+  isDirectoryPickerSupported,
+} from '../services/markdownExport';
 
 interface NoteModalProps {
   note: Note | null;
@@ -64,6 +74,8 @@ export const NoteModal: React.FC<NoteModalProps> = ({
   const [tags, setTags] = useState<string[]>(note.tags || []);
   const [tagInput, setTagInput] = useState('');
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [pageIndexToDelete, setPageIndexToDelete] = useState<number | null>(null);
   const [isConfirmTrashOpen, setIsConfirmTrashOpen] = useState(false);
 
@@ -85,6 +97,55 @@ export const NoteModal: React.FC<NoteModalProps> = ({
     media: [],
     createdAt: Date.now(),
     updatedAt: Date.now(),
+  };
+
+  const getNoteSnapshot = (): Note => ({
+    ...note,
+    title: title.trim(),
+    color,
+    isPinned,
+    tags,
+    pages,
+    activePageIndex: safePageIndex,
+    updatedAt: Date.now(),
+  });
+
+  const handleExportZip = async () => {
+    setIsExporting(true);
+    setShowExportMenu(false);
+    try {
+      await exportNoteAsMarkdownProject(getNoteSnapshot());
+    } catch (err: any) {
+      alert(`Export failed: ${err?.message || 'Error exporting markdown project'}`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const canUseDirectoryPicker = isDirectoryPickerSupported();
+
+  const handleExportDirectFolder = async () => {
+    setIsExporting(true);
+    setShowExportMenu(false);
+    try {
+      const folderPath = await exportNoteToLocalDirectory(getNoteSnapshot());
+      alert(`Successfully saved real note folder to: ${folderPath}`);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        alert(`Folder export error: ${err?.message || 'Error writing to directory'}`);
+      }
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportStandaloneMd = () => {
+    setShowExportMenu(false);
+    try {
+      exportNoteAsStandaloneMarkdown(getNoteSnapshot());
+    } catch (err: any) {
+      alert(`Export failed: ${err?.message || 'Error exporting markdown file'}`);
+    }
   };
 
   // Sync back to parent when closing or editing
@@ -637,8 +698,73 @@ export const NoteModal: React.FC<NoteModalProps> = ({
             </button>
           </div>
 
-          {/* Right actions: Archive, Trash, Close */}
+          {/* Right actions: Export, Archive, Trash, Close */}
           <div className="flex items-center gap-2">
+            {/* Export as Markdown Project (.zip with index.md + assets/) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                disabled={isExporting}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/30 text-xs font-semibold transition cursor-pointer"
+                title="Export note as .md project with assets/ folder"
+              >
+                {isExporting ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <FolderArchive size={15} />
+                )}
+                <span className="hidden sm:inline">Export .md Project</span>
+              </button>
+
+              {showExportMenu && (
+                <div className="absolute bottom-11 right-0 z-50 bg-[#292a2d] p-2 rounded-xl shadow-2xl border border-gray-700 w-64 text-xs text-gray-200 animate-in fade-in">
+                  <div className="px-2 py-1 border-b border-gray-700 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                    Markdown Project Export
+                  </div>
+                  {canUseDirectoryPicker && (
+                    <button
+                      type="button"
+                      onClick={handleExportDirectFolder}
+                      className="w-full text-left px-2.5 py-2 hover:bg-amber-500/20 rounded-lg flex items-start gap-2.5 mt-1 transition cursor-pointer"
+                    >
+                      <FolderDown size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-semibold text-amber-300">Save to Local Folder</div>
+                        <div className="text-[11px] text-gray-300">
+                          Writes real folder to disk with <code className="text-amber-300">index.md</code> & <code className="text-amber-300">assets/</code>
+                        </div>
+                      </div>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleExportZip}
+                    className="w-full text-left px-2.5 py-2 hover:bg-gray-800 rounded-lg flex items-start gap-2.5 mt-1 transition cursor-pointer"
+                  >
+                    <FolderArchive size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-semibold text-white">Full Project (.zip)</div>
+                      <div className="text-[11px] text-gray-400">
+                        <code className="text-amber-300">index.md</code> + <code className="text-amber-300">assets/</code> folder (sketches, images, audio, video)
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportStandaloneMd}
+                    className="w-full text-left px-2.5 py-2 hover:bg-gray-800 rounded-lg flex items-start gap-2.5 transition cursor-pointer"
+                  >
+                    <FileCode size={16} className="text-blue-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-semibold text-white">Standalone index.md</div>
+                      <div className="text-[11px] text-gray-400">Single markdown file with all pages & metadata</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
             <button
               type="button"
               onClick={() => {

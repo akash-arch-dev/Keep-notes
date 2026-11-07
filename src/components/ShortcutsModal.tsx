@@ -91,6 +91,9 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
               <p>
                 • <strong>Offline Support</strong>: All data is stored in high-capacity local IndexedDB; notes and vocabulary are available even without network.
               </p>
+              <p>
+                • <strong>Markdown Project Export</strong>: Export any individual note or your entire library as a standard Markdown project archive (.zip) containing <code className="text-amber-400">index.md</code> and an <code className="text-amber-400">assets/</code> folder with all drawings, photos, audio & video. Ready for Obsidian, VS Code, or static publishing!
+              </p>
             </div>
           </div>
         </div>
