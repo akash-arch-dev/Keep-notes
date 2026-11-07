@@ -2,7 +2,10 @@
   "name": "keepscribe",
   "version": "1.0.0",
   "description": "Extended Google Keep for creative writers with multi-page notes, sketches, audio, video, and vocabulary codex",
-  "author": "Akash",
+  "author": {
+  "name": "Akash",
+  "email": "akash.self.code@gmail.com"
+},
   "main": "electron/main.cjs",
   "private": true,
   "type": "module",
