@@ -1,8 +1,16 @@
 node_modules/
 build/
 dist/
+release-builds/
+dist-linux/
+dist-apk/
+release-assets/
+android/.gradle/
+android/app/build/
+android/build/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
+

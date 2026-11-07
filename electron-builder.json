@@ -1,6 +1,8 @@
 {
   "appId": "com.keepscribe.desktop",
   "productName": "KeepScribe",
+  "electronVersion": "33.2.1",
+  "asar": false,
   "directories": {
     "output": "release-builds"
   },
@@ -11,7 +13,8 @@
     "package.json"
   ],
   "extraMetadata": {
-    "main": "electron/main.cjs"
+    "main": "electron/main.cjs",
+    "author": "Akash"
   },
   "linux": {
     "target": [

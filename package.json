@@ -2,6 +2,8 @@
   "name": "keepscribe",
   "version": "1.0.0",
   "description": "Extended Google Keep for creative writers with multi-page notes, sketches, audio, video, and vocabulary codex",
+  "author": "Akash",
+  "main": "electron/main.cjs",
   "private": true,
   "type": "module",
   "scripts": {
@@ -28,11 +30,15 @@
     "vite": "^8.3.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
+    "electron": "^45.2.3",
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",

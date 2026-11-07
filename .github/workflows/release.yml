@@ -38,12 +38,12 @@ jobs:
 
       - name: Package Linux Binaries (AppImage, DEB, Tarball)
         run: |
-          npx --yes electron-builder --config electron-builder.json --linux AppImage deb tar.gz
+          npx electron-builder --config electron-builder.json --linux AppImage deb tar.gz
 
       - name: Collect Linux Release Artifacts
         run: |
           mkdir -p dist-linux
-          find release-builds -maxdepth 1 -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.tar.gz" \) -exec cp {} dist-linux/ \;
+          find release-builds -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.tar.gz" \) -exec cp {} dist-linux/ \;
           echo "Generated Linux releases:"
           ls -la dist-linux
 
@@ -67,9 +67,6 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -81,34 +78,33 @@ jobs:
       - name: Build Web Application
         run: npm run build
 
-      - name: Setup Capacitor Android
-        run: |
-          npm install --save-dev @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
-          npx cap add android || true
-          npx cap sync android
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug assembleRelease --stacktrace
+          ./gradlew assembleDebug assembleRelease
 
       - name: Sign & Package APKs
         run: |
           mkdir -p dist-apk
 
-          # Build-tools detection
           BUILD_TOOLS_DIR=$(find $ANDROID_SDK_ROOT/build-tools -maxdepth 1 -type d | sort -V | tail -n 1)
           APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
           ZIPALIGN="$BUILD_TOOLS_DIR/zipalign"
 
-          # 1. Debug APK (always built and signed by Android SDK)
+          # 1. Debug APK (always built and signed)
           DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -n 1)
           if [ -f "$DEBUG_APK" ]; then
             cp "$DEBUG_APK" dist-apk/KeepScribe-debug.apk
           fi
 
-          # 2. Release APK (Signed with generated or custom key)
+          # 2. Release APK (Signed with generated release key)
           UNSIGNED_APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
           if [ -f "$UNSIGNED_APK" ]; then
             KEYSTORE_FILE="/tmp/keepscribe.keystore"
@@ -119,6 +115,8 @@ jobs:
             $ZIPALIGN -v -p 4 "$UNSIGNED_APK" dist-apk/KeepScribe-release-aligned.apk
             $APKSIGNER sign --ks $KEYSTORE_FILE --ks-pass pass:$KEYSTORE_PASS --ks-key-alias keepscribe --key-pass pass:$KEYSTORE_PASS --out dist-apk/KeepScribe-release-signed.apk dist-apk/KeepScribe-release-aligned.apk
             rm -f dist-apk/KeepScribe-release-aligned.apk
+          elif [ -f "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" dist-apk/KeepScribe-release-signed.apk
           fi
 
           echo "Generated Android APKs:"
