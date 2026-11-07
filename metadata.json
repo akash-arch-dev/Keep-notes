@@ -1,0 +1,6 @@
+{
+  "name": "KeepScribe - Creative Writer's Studio",
+  "description": "An extended Google Keep for creative writers with multi-page story notes, sketch & media elements, and an interactive key-value vocabulary map.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
